@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <title>BIRF 드론 현황판</title>
-<!-- v2.1 간편 버전 -->
+<!-- v2.2 간편 버전 -->
 <style>
 :root{--bg:#eef0ec;--card:#fff;--ink:#111418;--sub:#5b6168;--line:#d9ddd6;--fly:#d7263d;--ok:#14833b;--chip:#f2f4f1}
 @media (prefers-color-scheme:dark){:root{--bg:#0d0f12;--card:#171a1f;--ink:#f2f3f5;--sub:#a3a9b1;--line:#2a2f36;--fly:#ff4d5e;--ok:#3ccf6e;--chip:#222730}}
@@ -35,6 +35,9 @@ header h1{font-size:16px;margin:0;font-weight:800}
 .pin{position:absolute;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:var(--c);color:#fff;font:800 12px/1 inherit;font-family:inherit;display:grid;place-items:center;border:2.5px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.55);pointer-events:none;transition:left .3s,top .3s}
 .pin::after{content:"";position:absolute;inset:-7px;border-radius:50%;border:3px solid var(--c);animation:pulse 1.5s ease-out infinite}
 .pin.mine{width:40px;height:40px;font-size:13px;border-color:#ffd60a}
+.pin.plan{background:rgba(17,20,24,.55);border:2.5px dashed #fff}.pin.plan::after{display:none}
+.btns{display:flex;gap:8px;max-width:900px;margin:0 auto}.btns .big{flex:1}.btns .no{flex:none;width:84px;border:1.5px solid var(--line);background:var(--chip);color:var(--ink);border-radius:16px;font-weight:800}
+.big.go{background:var(--ok)}
 .pin.near{box-shadow:0 0 0 3px #d7263d,0 2px 6px rgba(0,0,0,.55)}
 @keyframes pulse{0%{transform:scale(.8);opacity:1}100%{transform:scale(1.6);opacity:0}}
 .hint{display:flex;align-items:center;gap:8px;padding:9px 12px;font-size:13px;color:var(--sub)}
@@ -126,6 +129,7 @@ const S = { units:{}, rev:'', offset:0, lastOk:0, fail:0, push:false, loaded:fal
 const pending = {};
 let myId = LS.get('unit', null);   // null = 아직 선택 안 함, '' = 보기 전용
 let pollTimer = null, polling = false, es = null, lastNearKey = '';
+let plan = null; // 비행 전, 지도에서 고른 예정 위치
 
 const now = () => Date.now() + S.offset;
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -273,8 +277,9 @@ $('#map').addEventListener('click', e => {
   const y = Math.round(Math.min(1, Math.max(0, (e.clientY - r.top)/r.height))*10000)/10000;
   const flying = (S.units[myId] || {}).s === 'fly';
   if (flying){ send('move', x, y); toast(`📍 위치 이동 · ${nearestZone(x, y)}`); }
-  else { send('fly', x, y); vib(40); toast(`🛫 비행 시작 공유됨 · ${nearestZone(x, y)}`, () => send('land')); }
+  else { plan = {x, y}; render(); }
 });
+function start(){ if (!plan) return; const p = plan; plan = null; send('fly', p.x, p.y); vib(40); toast(`🛫 비행 시작 공유됨 · ${nearestZone(p.x, p.y)}`); }
 function land(){ send('land'); vib(40); toast('🛬 비행 종료 공유됨'); }
 
 /* ---------- 다른 팀 변화 감지 → 소리/팝업 ---------- */
@@ -322,6 +327,7 @@ function render(){
     el.className = 'pin' + (id === myId ? ' mine' : '') + (nearSet.has(id) ? ' near' : '');
     el.style.setProperty('--c', U[id].color); el.style.left = x*100 + '%'; el.style.top = y*100 + '%'; el.textContent = U[id].short;
   });
+  if (plan && myId && !(S.units[myId] && S.units[myId].s === 'fly')){ keep.add('_plan'); let el = pinEls._plan; if (!el){ el = document.createElement('div'); $('#map').appendChild(el); pinEls._plan = el; } el.className = 'pin plan'; el.style.setProperty('--c', U[myId].color); el.style.left = plan.x*100 + '%'; el.style.top = plan.y*100 + '%'; el.textContent = U[myId].short; } else plan = flying0() ? null : plan;
   Object.keys(pinEls).forEach(k => { if (!keep.has(k)){ pinEls[k].remove(); delete pinEls[k]; } });
 
   // 목록
@@ -334,12 +340,14 @@ function render(){
   const u = U[myId];
   $('#meBtn').innerHTML = u ? `<i style="--c:${u.color}">${esc(u.short)}</i>${esc(label(myId))} ▾` : '👀 보기 전용 ▾';
   const flying = myId && (S.units[myId] || {}).s === 'fly';
-  $('#hint').textContent = !myId ? '깜빡이는 핀 = 비행 중' : flying ? '비행 중 · 지도를 누르면 내 위치가 옮겨져요' : '👆 지도에서 비행할 위치를 누르면 시작돼요';
+  $('#hint').textContent = !myId ? '깜빡이는 핀 = 비행 중' : flying ? '비행 중 · 지도를 누르면 내 위치가 옮겨져요' : plan ? '점선 핀 위치가 맞으면 아래 버튼을 누르세요' : '👆 지도에서 비행할 위치를 누르세요';
   $('#bar').innerHTML = !myId ? `<div class="tip">보기 전용<small>상단 버튼에서 내 드론을 고르면 비행을 알릴 수 있어요</small></div>`
     : flying ? `<button class="big" id="landBtn">🛬 비행 종료<small>${esc(S.units[myId].z || '')} · <span data-since="${S.units[myId].since}">${mmss(now()-S.units[myId].since)}</span></small></button>`
-    : `<div class="tip">👆 지도에서 위치를 누르면 비행 시작<small>모든 팀에 소리·팝업으로 알려집니다</small></div>`;
+    : plan ? `<div class="btns"><button class="big go" id="goBtn">🛫 여기서 비행 시작<small>${esc(nearestZone(plan.x, plan.y))} · 모든 팀에 알림</small></button><button class="no" id="noBtn">취소</button></div>`
+    : `<div class="tip">👆 지도에서 비행할 위치를 누르세요<small>위치를 고른 뒤 시작 버튼을 누르면 모든 팀에 알려집니다</small></div>`;
   syncUnlock();
 }
+function flying0(){ return !!(myId && S.units[myId] && S.units[myId].s === 'fly'); }
 function showPick(){
   $('#pick').innerHTML = `<h2>내 드론을 선택하세요</h2><p>한 번 고르면 이 폰에 기억돼요. 나중에 상단 버튼으로 바꿀 수 있습니다.</p><div class="grid">` +
     UNITS.map(u => `<button data-pick="${u.id}"><i class="badge" style="--c:${u.color}">${esc(u.short)}</i><span>${esc(u.org)} ${esc(u.drone)}<small>${esc(u.team)}</small></span></button>`).join('') +
@@ -353,6 +361,8 @@ document.addEventListener('click', e => {
   const t = e.target.closest('button'); if (!t) return;
   if (t.dataset.pick != null){ myId = t.dataset.pick; LS.set('unit', myId); $('#pick').classList.add('hidden'); render(); if (myId) toast(`${label(myId)} 선택됨 · 지도를 눌러 비행 시작`); return; }
   if (t.id === 'landBtn') return land();
+  if (t.id === 'goBtn') return start();
+  if (t.id === 'noBtn'){ plan = null; return render(); }
   if (t.id === 'unlock'){ soundOn = true; LS.set('sound', true); unlockAudio(); t.classList.add('hidden'); toast('🔔 알림 소리 켜짐'); return; }
   if (t.id === 'meBtn'){ if ((S.units[myId] || {}).s === 'fly'){ toast('비행 중에는 바꿀 수 없어요. 먼저 종료를 눌러주세요'); return; } return showPick(); }
   if (t.id === 'toastBtn'){ if (toastUndo){ const f = toastUndo; toastUndo = null; f(); toast('취소했어요'); } return; }
