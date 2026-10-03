@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <title>BIRF 드론 현황판</title>
-<!-- v2.0 간편 버전 -->
+<!-- v2.1 간편 버전 -->
 <style>
 :root{--bg:#eef0ec;--card:#fff;--ink:#111418;--sub:#5b6168;--line:#d9ddd6;--fly:#d7263d;--ok:#14833b;--chip:#f2f4f1}
 @media (prefers-color-scheme:dark){:root{--bg:#0d0f12;--card:#171a1f;--ink:#f2f3f5;--sub:#a3a9b1;--line:#2a2f36;--fly:#ff4d5e;--ok:#3ccf6e;--chip:#222730}}
@@ -69,7 +69,7 @@ header h1{font-size:16px;margin:0;font-weight:800}
 .toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:12px;font-weight:700;font-size:14px;z-index:40;display:none;align-items:center;gap:12px;max-width:94vw}
 .toast.show{display:flex}
 .toast button{white-space:nowrap;flex:none;background:var(--bg);color:var(--ink);border:0;border-radius:8px;padding:6px 10px;font-weight:800}
-.unlock{position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:34;background:#1b4dd8;color:#fff;font-weight:800;font-size:13px;padding:9px 14px;border-radius:999px;white-space:nowrap;pointer-events:none}
+.unlock{position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:34;background:#1b4dd8;color:#fff;font-weight:800;font-size:14px;padding:11px 16px;border:0;border-radius:999px;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.3)}
 .hidden{display:none!important}
 </style>
 </head>
@@ -92,7 +92,7 @@ header h1{font-size:16px;margin:0;font-weight:800}
 <div class="bar" id="bar"></div>
 <div class="toast" id="toast"><span id="toastMsg"></span><button id="toastBtn" class="hidden">취소</button></div>
 <div class="pops" id="pops"></div>
-<div class="unlock hidden" id="unlock">🔊 화면을 한 번 탭하면 알림 소리가 켜져요</div>
+<button class="unlock hidden" id="unlock">🔊 여기를 눌러 알림 소리 켜기</button>
 <div class="pick hidden" id="pick"></div>
 
 <script>
@@ -353,6 +353,7 @@ document.addEventListener('click', e => {
   const t = e.target.closest('button'); if (!t) return;
   if (t.dataset.pick != null){ myId = t.dataset.pick; LS.set('unit', myId); $('#pick').classList.add('hidden'); render(); if (myId) toast(`${label(myId)} 선택됨 · 지도를 눌러 비행 시작`); return; }
   if (t.id === 'landBtn') return land();
+  if (t.id === 'unlock'){ soundOn = true; LS.set('sound', true); unlockAudio(); t.classList.add('hidden'); toast('🔔 알림 소리 켜짐'); return; }
   if (t.id === 'meBtn'){ if ((S.units[myId] || {}).s === 'fly'){ toast('비행 중에는 바꿀 수 없어요. 먼저 종료를 눌러주세요'); return; } return showPick(); }
   if (t.id === 'toastBtn'){ if (toastUndo){ const f = toastUndo; toastUndo = null; f(); toast('취소했어요'); } return; }
   if (t.id === 'sndBtn'){ soundOn = !soundOn; LS.set('sound', soundOn); t.textContent = soundOn ? '🔔' : '🔕'; t.classList.toggle('off', !soundOn); if (soundOn) unlockAudio(); toast(soundOn ? '🔔 알림 소리 켜짐' : '🔕 소리 꺼짐 (팝업·진동은 유지)'); syncUnlock(); return; }
