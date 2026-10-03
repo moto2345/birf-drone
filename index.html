@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <title>BIRF 드론 현황판</title>
-<!-- v3.0 업체 선택 버전 -->
+<!-- v3.1 업체 선택 버전 -->
 <style>
 :root{--bg:#eef0ec;--card:#fff;--ink:#111418;--sub:#5b6168;--line:#d9ddd6;--fly:#d7263d;--ok:#14833b;--chip:#f2f4f1}
 @media (prefers-color-scheme:dark){:root{--bg:#0d0f12;--card:#171a1f;--ink:#f2f3f5;--sub:#a3a9b1;--line:#2a2f36;--fly:#ff4d5e;--ok:#3ccf6e;--chip:#222730}}
@@ -111,14 +111,14 @@ const CONFIG = {
   PUSH_BASE: 'https://ntfy.sh', POLL_FAST: 2500, POLL_SLOW: 6000, NEAR: 0.075
 };
 const UNITS = [
-  {id:'sr_m4', team:'삼락 중계',  org:'원샷스튜디오',      drone:'매빅4',     short:'삼4', color:'#2a4bd7'},
-  {id:'sr_av', team:'삼락 중계',  org:'원샷스튜디오',      drone:'아바타2',   short:'삼A', color:'#2a4bd7'},
-  {id:'gr_m3', team:'그린 중계',  org:'굿데이픽쳐스',      drone:'매빅3',     short:'그린', color:'#0b8a3a'},
-  {id:'hd_m3', team:'기록영상',   org:'하드론',            drone:'매빅3',     short:'하드', color:'#e8590c'},
-  {id:'jd_av', team:'기록영상',   org:'제이디',            drone:'아바타2',   short:'JD',  color:'#7b2fbe'},
-  {id:'ts_m3', team:'토스 스케치', org:'How Penguins Fly?', drone:'매빅3',   short:'토3', color:'#0b7285'},
-  {id:'ts_in', team:'토스 스케치', org:'How Penguins Fly?', drone:'인스파이어', short:'토I', color:'#0b7285'},
-  {id:'ph_m3', team:'기록사진',   org:'이미지노마드',      drone:'매빅3',     short:'사진', color:'#c2255c'}
+  {id:'sr_m4', team:'삼락중계팀', org:'원샷스튜디오',      drone:'매빅4',     short:'삼4', color:'#2a4bd7'},
+  {id:'sr_av', team:'삼락중계팀', org:'원샷스튜디오',      drone:'아바타2',   short:'삼A', color:'#2a4bd7'},
+  {id:'gr_m3', team:'그린중계팀', org:'굿데이픽쳐스',      drone:'매빅3',     short:'그린', color:'#0b8a3a'},
+  {id:'hd_m3', team:'기록영상팀', org:'하드론',            drone:'매빅3',     short:'하드', color:'#e8590c'},
+  {id:'jd_av', team:'기록영상팀', org:'제이디',            drone:'아바타2',   short:'JD',  color:'#7b2fbe'},
+  {id:'ph_m3', team:'기록사진팀', org:'이미지노마드',      drone:'매빅3',     short:'사진', color:'#c2255c'},
+  {id:'ts_m3', team:'전체스케치', org:'How Penguins Fly?', drone:'매빅3',     short:'스3', color:'#0b7285'},
+  {id:'ts_in', team:'전체스케치', org:'How Penguins Fly?', drone:'인스파이어', short:'스I', color:'#0b7285'}
 ];
 const ZONES = [{id:'그린',x:.114,y:.235},{id:'삼락',x:.263,y:.49},{id:'웨이브',x:.217,y:.797},{id:'히든',x:.647,y:.735},{id:'리버',x:.888,y:.72}];
 
@@ -374,7 +374,7 @@ function render(){
 }
 function showPick(){
   $('#pick').innerHTML = `<h2>내 업체를 선택하세요</h2><p>기종은 이륙할 때 고르면 돼요 · 이 폰에 기억됨</p><div class="orgs">` +
-    ORGS.map(g => `<button class="org${g.org === myOrg ? ' on' : ''}" data-org="${esc(g.org)}" style="--c:${g.color}"><span class="oh"><b>${esc(g.org)}</b><span>${esc(g.team)}</span></span><span class="ds">` +
+    ORGS.map(g => `<button class="org${g.org === myOrg ? ' on' : ''}" data-org="${esc(g.org)}" style="--c:${g.color}"><span class="oh"><b>${esc(g.team)}</b><span>${esc(g.org)}</span></span><span class="ds">` +
       g.list.map(u => `<em>${esc(u.drone)}</em>`).join('') + `</span></button>`).join('') +
     `<button class="view" data-org="">👀 보기만 할게요 (관제·연출)</button></div>`;
   $('#pick').classList.remove('hidden');
@@ -384,7 +384,7 @@ setInterval(() => { setDot(); if (S.loaded) render(); }, 15000);
 
 document.addEventListener('click', e => {
   const t = e.target.closest('button'); if (!t) return;
-  if (t.dataset.org != null){ myOrg = t.dataset.org; LS.set('org', myOrg); plan = null; $('#pick').classList.add('hidden'); render(); if (myOrg) toast(`${myOrg} 선택됨 · 지도를 눌러 비행 시작`); return; }
+  if (t.dataset.org != null){ myOrg = t.dataset.org; LS.set('org', myOrg); plan = null; $('#pick').classList.add('hidden'); render(); if (myOrg){ const g = ORGS.find(o => o.org === myOrg); toast(`${g.team} · ${myOrg} 선택됨 · 지도를 눌러 비행 시작`); } return; }
   if (t.dataset.go) return start(t.dataset.go);
   if (t.dataset.mv) return moveTo(t.dataset.mv);
   if (t.dataset.land) return land(t.dataset.land);
