@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <title>BIRF 드론 현황판</title>
-<!-- v2.2 간편 버전 -->
+<!-- v2.3 간편 버전 -->
 <style>
 :root{--bg:#eef0ec;--card:#fff;--ink:#111418;--sub:#5b6168;--line:#d9ddd6;--fly:#d7263d;--ok:#14833b;--chip:#f2f4f1}
 @media (prefers-color-scheme:dark){:root{--bg:#0d0f12;--card:#171a1f;--ink:#f2f3f5;--sub:#a3a9b1;--line:#2a2f36;--fly:#ff4d5e;--ok:#3ccf6e;--chip:#222730}}
@@ -217,7 +217,7 @@ async function poll(){
   finally{ polling = false; setDot(); schedule(); }
 }
 function schedule(){
-  clearTimeout(pollTimer); if (document.hidden) return;
+  clearTimeout(pollTimer); if (document.hidden && S.loaded) return; // 첫 불러오기 실패 시엔 화면이 가려져 있어도 재시도
   const base = S.push ? CONFIG.POLL_SLOW : CONFIG.POLL_FAST;
   pollTimer = setTimeout(poll, S.fail ? Math.min(15000, base*(1+S.fail)) : base);
 }
