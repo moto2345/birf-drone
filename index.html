@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <title>BIRF 드론 현황판</title>
-<!-- v2.3 간편 버전 -->
+<!-- v2.4 간편 버전 -->
 <style>
 :root{--bg:#eef0ec;--card:#fff;--ink:#111418;--sub:#5b6168;--line:#d9ddd6;--fly:#d7263d;--ok:#14833b;--chip:#f2f4f1}
 @media (prefers-color-scheme:dark){:root{--bg:#0d0f12;--card:#171a1f;--ink:#f2f3f5;--sub:#a3a9b1;--line:#2a2f36;--fly:#ff4d5e;--ok:#3ccf6e;--chip:#222730}}
@@ -54,12 +54,17 @@ header h1{font-size:16px;margin:0;font-weight:800}
 .bar .tip small{display:block;color:var(--sub);font-weight:600;font-size:12px}
 /* 드론 선택 */
 .pick{position:fixed;inset:0;z-index:50;background:var(--bg);overflow:auto;padding:20px 14px calc(20px + env(safe-area-inset-bottom))}
-.pick h2{margin:6px 0 4px;font-size:20px}.pick p{margin:0 0 14px;color:var(--sub);font-size:14px}
-.pick .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:600px}
-.pick button{display:flex;align-items:center;gap:10px;text-align:left;border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:12px 10px;min-height:62px}
-.pick button .badge{width:32px;height:32px;line-height:32px;font-size:11px}
-.pick button span{font-size:14px;font-weight:700;line-height:1.25}.pick button small{display:block;color:var(--sub);font-size:11px;font-weight:500}
-.pick .view{grid-column:1/-1;justify-content:center;color:var(--sub)}
+.pick h2{margin:6px 0 4px;font-size:21px}.pick p{margin:0 0 16px;color:var(--sub);font-size:14px}
+.orgs{display:flex;flex-direction:column;gap:10px;max-width:600px}
+.org{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:12px 14px}
+.oh{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.oh .cbar{width:6px;height:22px;border-radius:3px;background:var(--c)}
+.oh b{font-size:17px}.oh span{margin-left:auto;font-size:12px;font-weight:700;color:var(--c);background:var(--chip);border-radius:999px;padding:4px 10px;white-space:nowrap}
+.ds{display:flex;gap:8px;flex-wrap:wrap}
+.ds button{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:var(--chip);border-radius:12px;padding:10px 14px;font-weight:800;font-size:16px;min-height:52px;flex:1;min-width:130px}
+.ds button.on{border-color:var(--c);box-shadow:inset 0 0 0 1.5px var(--c)}
+.ds .badge{width:30px;height:30px;line-height:30px;font-size:11px}
+.orgs .view{border:1.5px dashed var(--line);background:none;border-radius:14px;min-height:52px;font-weight:700;color:var(--sub)}
 /* 팝업 / 토스트 */
 .pops{position:fixed;top:60px;left:0;right:0;z-index:35;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 10px;pointer-events:none}
 .pop{pointer-events:auto;width:100%;max-width:520px;background:var(--card);border-radius:16px;border:3px solid var(--c);box-shadow:0 8px 28px rgba(0,0,0,.35);padding:12px 14px;display:flex;gap:12px;align-items:center;animation:popin .25s ease-out}
@@ -349,8 +354,11 @@ function render(){
 }
 function flying0(){ return !!(myId && S.units[myId] && S.units[myId].s === 'fly'); }
 function showPick(){
-  $('#pick').innerHTML = `<h2>내 드론을 선택하세요</h2><p>한 번 고르면 이 폰에 기억돼요. 나중에 상단 버튼으로 바꿀 수 있습니다.</p><div class="grid">` +
-    UNITS.map(u => `<button data-pick="${u.id}"><i class="badge" style="--c:${u.color}">${esc(u.short)}</i><span>${esc(u.org)} ${esc(u.drone)}<small>${esc(u.team)}</small></span></button>`).join('') +
+  const orgs = [];
+  UNITS.forEach(u => { let g = orgs.find(o => o.org === u.org); if (!g){ g = {org:u.org, team:u.team, color:u.color, list:[]}; orgs.push(g); } g.list.push(u); });
+  $('#pick').innerHTML = `<h2>내 드론을 선택하세요</h2><p>업체를 찾아 기종을 누르세요. 이 폰에 기억되고, 상단 버튼으로 언제든 바꿀 수 있어요.</p><div class="orgs">` +
+    orgs.map(g => `<div class="org" style="--c:${g.color}"><div class="oh"><i class="cbar"></i><b>${esc(g.org)}</b><span>${esc(g.team)}</span></div><div class="ds">` +
+      g.list.map(u => `<button data-pick="${u.id}" class="${u.id === myId ? 'on' : ''}"><i class="badge">${esc(u.short)}</i>${esc(u.drone)}</button>`).join('') + `</div></div>`).join('') +
     `<button class="view" data-pick="">👀 보기만 할게요 (관제·연출)</button></div>`;
   $('#pick').classList.remove('hidden');
 }
