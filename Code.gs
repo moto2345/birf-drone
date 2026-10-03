@@ -19,7 +19,7 @@ var TZ = 'Asia/Seoul';
 var STATE_HEADERS = ['드론ID', '상태', '구역', 'x', 'y', '고도', '메모', '이륙시각(ms)', '갱신(ms)', '갱신시각'];
 var LOG_HEADERS = ['시각', '드론ID', '동작', '구역', '고도', '메모', '비행시간(분)'];
 var LOG_RETURN = 30;      // 화면에 돌려줄 최근 기록 수
-var CACHE_SEC = 300;      // 캐시 유지 시간(초). 쓰기 때마다 즉시 갱신됨
+var CACHE_SEC = 21600;    // 캐시 유지 시간(초, 최대 6시간). 쓰기·시트 수정 때마다 즉시 갱신됨
 
 function doGet(e) {
   var p = (e && e.parameter) || {};
@@ -51,8 +51,19 @@ function getState_(p) {
   if (rev && snap) {
     o = JSON.parse(snap);
   } else {
-    o = buildSnap_(SpreadsheetApp.getActiveSpreadsheet());
-    putCache_(o);
+    // 캐시가 비었을 때: 이착륙 저장과 겹치면 옛 상태로 캐시를 덮어쓸 수 있어 잠금 안에서 다시 채움
+    var lock = LockService.getScriptLock();
+    if (lock.tryLock(5000)) {
+      try {
+        var g2 = cache.getAll(['rev', 'snap']);           // 기다리는 사이 다른 요청이 채웠으면 그대로 사용
+        if (g2.rev && g2.snap) o = JSON.parse(g2.snap);
+        else { o = buildSnap_(SpreadsheetApp.getActiveSpreadsheet()); putCache_(o); }
+      } finally {
+        lock.releaseLock();
+      }
+    } else {
+      o = buildSnap_(SpreadsheetApp.getActiveSpreadsheet()); // 잠금을 못 얻으면 캐시에 넣지 않고 응답만
+    }
   }
   o.ok = true;
   o.now = Date.now();
