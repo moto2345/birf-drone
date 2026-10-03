@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <title>BIRF 드론 현황판</title>
-<!-- v3.2 업체 선택 버전 -->
+<!-- v3.3 업체 선택 버전 -->
 <style>
 :root{--bg:#eef0ec;--card:#fff;--ink:#111418;--sub:#5b6168;--line:#d9ddd6;--fly:#d7263d;--ok:#14833b;--chip:#f2f4f1}
 @media (prefers-color-scheme:dark){:root{--bg:#0d0f12;--card:#171a1f;--ink:#f2f3f5;--sub:#a3a9b1;--line:#2a2f36;--fly:#ff4d5e;--ok:#3ccf6e;--chip:#222730}}
@@ -33,9 +33,10 @@ header h1{font-size:16px;margin:0;font-weight:800}
 .mapbox{position:relative;overflow:hidden;background:#2b3a2b}
 .mapin{position:relative;width:100%;aspect-ratio:1140/680;cursor:crosshair;user-select:none;touch-action:manipulation}
 .mapin img{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.pin{position:absolute;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:var(--c);color:#fff;font:800 12px/1 inherit;font-family:inherit;display:grid;place-items:center;border:2.5px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.55);pointer-events:none;transition:left .3s,top .3s}
-.pin::after{content:"";position:absolute;inset:-7px;border-radius:50%;border:3px solid var(--c);animation:pulse 1.5s ease-out infinite}
-.pin.mine{width:40px;height:40px;font-size:13px;border-color:#ffd60a}
+.pin{position:absolute;transform:translate(-50%,-50%);min-width:48px;height:28px;padding:0 7px;white-space:nowrap;border-radius:14px;background:var(--c);color:#fff;font:800 12px/1 inherit;font-family:inherit;display:grid;place-items:center;border:2.5px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.55);pointer-events:none;transition:left .3s,top .3s}
+.pin::after{content:"";position:absolute;inset:-6px;border-radius:20px;border:3px solid var(--c);animation:pulse2 1.5s ease-out infinite}
+@keyframes pulse2{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.35,1.6);opacity:0}}
+.pin.mine{min-width:54px;height:32px;border-radius:16px;font-size:13px;border-color:#ffd60a}
 .pin.plan{background:rgba(17,20,24,.55);border:2.5px dashed #fff}.pin.plan::after{display:none}
 .btns{display:flex;gap:8px;max-width:900px;margin:0 auto}.btns .big{flex:1}.btns .no{flex:none;width:84px;border:1.5px solid var(--line);background:var(--chip);color:var(--ink);border-radius:16px;font-weight:800}
 .big.go{background:var(--ok)}
@@ -46,7 +47,7 @@ header h1{font-size:16px;margin:0;font-weight:800}
 .hint{display:flex;align-items:center;gap:8px;padding:9px 12px;font-size:13px;color:var(--sub)}
 .hint button{margin-left:auto;background:none;border:0;color:var(--sub);font-weight:700;text-decoration:underline;font-size:12px}
 .row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-top:1px solid var(--line)}
-.row .badge{width:30px;height:30px;font-size:11px;line-height:30px}
+.row .badge{width:auto;min-width:46px;height:26px;padding:0 6px;border-radius:13px;font-size:11.5px;line-height:26px;white-space:nowrap}
 .row b{flex:1;font-size:14px}.row small{display:block;color:var(--sub);font-weight:500;font-size:12px}
 .st{font-weight:800;font-size:12px;border-radius:999px;padding:5px 10px;background:var(--fly);color:#fff;white-space:nowrap}
 .empty{padding:12px;color:var(--sub);font-size:13px;border-top:1px solid var(--line)}
@@ -69,7 +70,7 @@ header h1{font-size:16px;margin:0;font-weight:800}
 /* 팝업 / 토스트 */
 .pops{position:fixed;bottom:calc(98px + env(safe-area-inset-bottom));left:0;right:0;z-index:35;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;padding:0 10px;pointer-events:none}
 .pop{pointer-events:auto;width:100%;max-width:520px;background:var(--card);border-radius:16px;border:3px solid var(--c);box-shadow:0 8px 28px rgba(0,0,0,.35);padding:12px 14px;display:flex;gap:12px;align-items:center;animation:popin .25s ease-out}
-.pop .badge{width:40px;height:40px;line-height:40px;font-size:13px}
+.pop .badge{width:auto;min-width:54px;height:32px;padding:0 8px;border-radius:16px;line-height:32px;font-size:13px;white-space:nowrap}
 .pop .k{font-size:13px;font-weight:900}.pop.fly .k{color:var(--fly)}.pop.land .k{color:var(--ok)}
 .pop b{display:block;font-size:17px}.pop small{color:var(--sub)}
 .pop.out{opacity:0;transition:opacity .3s}
@@ -111,14 +112,14 @@ const CONFIG = {
   PUSH_BASE: 'https://ntfy.sh', POLL_FAST: 2500, POLL_SLOW: 6000, NEAR: 0.075
 };
 const UNITS = [
-  {id:'sr_m4', team:'삼락중계팀', org:'원샷스튜디오',      drone:'매빅4',     short:'매4', color:'#2a4bd7'},
-  {id:'sr_av', team:'삼락중계팀', org:'원샷스튜디오',      drone:'아바타2',   short:'아2', color:'#2a4bd7'},
-  {id:'gr_m3', team:'그린중계팀', org:'굿데이픽쳐스',      drone:'매빅3',     short:'매3', color:'#0b8a3a'},
-  {id:'hd_m3', team:'기록영상팀', org:'하드론',            drone:'매빅3',     short:'매3', color:'#e8590c'},
-  {id:'jd_av', team:'기록영상팀', org:'제이디',            drone:'아바타2',   short:'아2',  color:'#7b2fbe'},
-  {id:'ph_m3', team:'기록사진팀', org:'이미지노마드',      drone:'매빅3',     short:'매3', color:'#c2255c'},
-  {id:'ts_m3', team:'전체스케치', org:'How Penguins Fly?', drone:'매빅3',     short:'매3', color:'#0b7285'},
-  {id:'ts_in', team:'전체스케치', org:'How Penguins Fly?', drone:'인스파이어', short:'인스', color:'#0b7285'}
+  {id:'sr_m4', team:'삼락중계팀', org:'원샷스튜디오',      drone:'매빅4',     short:'매빅4', color:'#2a4bd7'},
+  {id:'sr_av', team:'삼락중계팀', org:'원샷스튜디오',      drone:'아바타2',   short:'아바2', color:'#2a4bd7'},
+  {id:'gr_m3', team:'그린중계팀', org:'굿데이픽쳐스',      drone:'매빅3',     short:'매빅3', color:'#0b8a3a'},
+  {id:'hd_m3', team:'기록영상팀', org:'하드론',            drone:'매빅3',     short:'매빅3', color:'#e8590c'},
+  {id:'jd_av', team:'기록영상팀', org:'제이디',            drone:'아바타2',   short:'아바2',  color:'#7b2fbe'},
+  {id:'ph_m3', team:'기록사진팀', org:'이미지노마드',      drone:'매빅3',     short:'매빅3', color:'#c2255c'},
+  {id:'ts_m3', team:'전체스케치', org:'How Penguins Fly?', drone:'매빅3',     short:'매빅3', color:'#0b7285'},
+  {id:'ts_in', team:'전체스케치', org:'How Penguins Fly?', drone:'인스파이어', short:'인스3', color:'#0b7285'}
 ];
 const ZONES = [{id:'그린',x:.114,y:.235},{id:'삼락',x:.263,y:.49},{id:'웨이브',x:.217,y:.797},{id:'히든',x:.647,y:.735},{id:'리버',x:.888,y:.72}];
 
@@ -334,7 +335,8 @@ function render(){
   const placed = [], keep = new Set();
   fl.forEach(([id,u]) => {
     let x = u.x ?? .5, y = u.y ?? .08, k = 0;
-    while (placed.some(q => Math.hypot(q.x-x, (q.y-y)*ASPECT) < .032) && k < 8){ k++; const a = k*Math.PI/3; x = (u.x ?? .5) + Math.cos(a)*.035; y = (u.y ?? .08) + Math.sin(a)*.035/ASPECT; }
+    const OFF = [[0,0],[0,.14],[0,-.14],[.15,0],[-.15,0],[.15,.14],[-.15,.14],[.15,-.14],[-.15,-.14]], bx = x, by = y;
+    while (placed.some(q => Math.abs(q.x-x) < .14 && Math.abs(q.y-y) < .13) && k < OFF.length-1){ k++; x = bx + OFF[k][0]; y = by + OFF[k][1]; }
     placed.push({x,y}); keep.add(id);
     let el = pinEls[id]; if (!el){ el = document.createElement('div'); $('#map').appendChild(el); pinEls[id] = el; }
     el.className = 'pin' + (isMine(id) ? ' mine' : '') + (nearSet.has(id) ? ' near' : '');
