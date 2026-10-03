@@ -217,7 +217,7 @@ footer{color:var(--sub);font-size:12px;padding:16px 2px 8px;display:flex;gap:12p
     </div>
   </div>
   <footer>
-    <span>v1.0 · 2026 부산국제록페스티벌 드론 소통용</span>
+    <span>v1.1 · 2026 부산국제록페스티벌 드론 소통용</span>
     <button class="linkbtn" id="shareBtn">공유 링크 복사</button>
     <button class="linkbtn" id="resetApiBtn">시트 연결 변경</button>
   </footer>
@@ -231,7 +231,7 @@ footer{color:var(--sub);font-size:12px;padding:16px 2px 8px;display:flex;gap:12p
 <script>
 /* ===================== 설정 (필요하면 여기만 수정) ===================== */
 const CONFIG = {
-  API_URL: '',                 // Apps Script 웹 앱 URL을 넣어두면 링크에 ?api= 없이도 바로 동작
+  API_URL: 'https://script.google.com/macros/s/AKfycbyP1CZNwNLRmin3zmlXd3201RVp3w7KXyM0xJSfURvRzQxQBRF6kMXHL6eyvzVoJFTEWg/exec', // Apps Script 웹 앱 URL
   PUSH_BASE: 'https://ntfy.sh',// 즉시 알림 중계(무료). 막히면 자동으로 시트 자동갱신만 사용
   POLL_FAST: 2500,             // 즉시 알림이 안 될 때 시트 확인 간격(ms)
   POLL_SLOW: 6000,             // 즉시 알림이 될 때 보조 확인 간격(ms)
@@ -267,7 +267,7 @@ const LS = {
   set(k, v){ try{ localStorage.setItem('birf_'+k, JSON.stringify(v)); }catch(_){} }
 };
 const qs = new URLSearchParams(location.search);
-const DEVICE = LS.get('dev', null) || (()=>{ const d = Math.random().toString(36).slice(2,10); LS.set('dev', d); return d; })();
+const DEVICE = Math.random().toString(36).slice(2,10); // 창(탭)마다 다르게 — 내 알림만 무시
 
 let API = CONFIG.API_URL || qs.get('api') || LS.get('api', '');
 if (qs.get('api')) LS.set('api', qs.get('api'));
