@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <title>BIRF 드론 현황판</title>
-<!-- v2.7 간편 버전 -->
+<!-- v3.0 업체 선택 버전 -->
 <style>
 :root{--bg:#eef0ec;--card:#fff;--ink:#111418;--sub:#5b6168;--line:#d9ddd6;--fly:#d7263d;--ok:#14833b;--chip:#f2f4f1}
 @media (prefers-color-scheme:dark){:root{--bg:#0d0f12;--card:#171a1f;--ink:#f2f3f5;--sub:#a3a9b1;--line:#2a2f36;--fly:#ff4d5e;--ok:#3ccf6e;--chip:#222730}}
@@ -23,6 +23,7 @@ header h1{font-size:16px;margin:0;font-weight:800}
 .dot.live{background:#3ccf6e;box-shadow:0 0 0 3px rgba(60,207,110,.25)}.dot.poll{background:#9ad14b}.dot.bad{background:#ff4d5e}
 .me{margin-left:auto;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border:0;border-radius:10px;padding:6px 10px;color:#fff;font-weight:700;font-size:13px;max-width:52vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .me i{font-size:9px!important;letter-spacing:-.5px}
+.me i:empty{width:14px;height:14px}
 .me i,.badge{flex:none;width:22px;height:22px;border-radius:50%;background:var(--c);color:#fff;font:800 10px/22px inherit;font-family:inherit;text-align:center;font-style:normal}
 .snd{background:rgba(255,255,255,.12);border:0;border-radius:10px;width:36px;height:34px;font-size:16px;flex:none}
 .snd.off{opacity:.5}
@@ -38,6 +39,8 @@ header h1{font-size:16px;margin:0;font-weight:800}
 .pin.plan{background:rgba(17,20,24,.55);border:2.5px dashed #fff}.pin.plan::after{display:none}
 .btns{display:flex;gap:8px;max-width:900px;margin:0 auto}.btns .big{flex:1}.btns .no{flex:none;width:84px;border:1.5px solid var(--line);background:var(--chip);color:var(--ink);border-radius:16px;font-weight:800}
 .big.go{background:var(--ok)}
+.big.mv{background:#1b4dd8}
+.btns.multi .big{font-size:16px;min-height:58px;padding:0 4px}.btns.multi .big small{font-size:11px}.btns.multi .no{width:62px}
 .pin.near{box-shadow:0 0 0 3px #d7263d,0 2px 6px rgba(0,0,0,.55)}
 @keyframes pulse{0%{transform:scale(.8);opacity:1}100%{transform:scale(1.6);opacity:0}}
 .hint{display:flex;align-items:center;gap:8px;padding:9px 12px;font-size:13px;color:var(--sub)}
@@ -52,31 +55,29 @@ header h1{font-size:16px;margin:0;font-weight:800}
 .big small{display:block;font-size:12px;font-weight:700;opacity:.9}
 .bar .tip{text-align:center;font-weight:800;font-size:15px;padding:14px 4px;color:var(--ink)}
 .bar .tip small{display:block;color:var(--sub);font-weight:600;font-size:12px}
-/* 드론 선택 */
-.pick{position:fixed;inset:0;z-index:50;background:var(--bg);overflow:auto;padding:20px 14px calc(20px + env(safe-area-inset-bottom))}
-.pick h2{margin:6px 0 4px;font-size:21px}.pick p{margin:0 0 16px;color:var(--sub);font-size:14px}
-.orgs{display:flex;flex-direction:column;gap:10px;max-width:600px}
-.org{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:12px 14px}
-.oh{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.oh .cbar{width:6px;height:22px;border-radius:3px;background:var(--c)}
-.oh b{font-size:17px}.oh span{margin-left:auto;font-size:12px;font-weight:700;color:var(--c);background:var(--chip);border-radius:999px;padding:4px 10px;white-space:nowrap}
-.ds{display:flex;gap:8px;flex-wrap:wrap}
-.ds button{display:flex;align-items:center;justify-content:center;gap:8px;border:1.5px solid var(--line);background:var(--chip);border-radius:12px;padding:10px 14px;font-weight:800;font-size:16px;min-height:52px;flex:1;min-width:130px}
-.ds button.on{border-color:var(--c);box-shadow:inset 0 0 0 1.5px var(--c)}
-.ds .badge{width:30px;height:30px;line-height:30px;font-size:11px}
-.orgs .view{border:1.5px dashed var(--line);background:none;border-radius:14px;min-height:52px;font-weight:700;color:var(--sub)}
+/* 업체 선택 (한 업체 = 한 줄 버튼) */
+.pick{position:fixed;inset:0;z-index:50;background:var(--bg);overflow:auto;padding:14px 12px calc(14px + env(safe-area-inset-bottom))}
+.pick h2{margin:2px 0 2px;font-size:18px}.pick p{margin:0 0 10px;color:var(--sub);font-size:12.5px}
+.orgs{display:flex;flex-direction:column;gap:6px;max-width:560px}
+.org{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--line);border-left:5px solid var(--c);border-radius:12px;padding:10px 10px 10px 12px;min-height:54px}
+.org.on{border-color:var(--c);box-shadow:inset 0 0 0 1.5px var(--c)}
+.oh{flex:1;min-width:0;line-height:1.25}
+.oh b{display:block;font-size:15px}.oh span{font-size:11px;font-weight:700;color:var(--c)}
+.ds{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:48%}
+.ds em{font-style:normal;font-size:12px;font-weight:700;color:var(--sub);background:var(--chip);border-radius:8px;padding:4px 8px;white-space:nowrap}
+.orgs .view{border:1.5px dashed var(--line);background:none;border-radius:12px;min-height:44px;font-weight:700;font-size:13px;color:var(--sub);margin-top:2px}
 /* 팝업 / 토스트 */
-.pops{position:fixed;top:60px;left:0;right:0;z-index:35;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 10px;pointer-events:none}
+.pops{position:fixed;bottom:calc(98px + env(safe-area-inset-bottom));left:0;right:0;z-index:35;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;padding:0 10px;pointer-events:none}
 .pop{pointer-events:auto;width:100%;max-width:520px;background:var(--card);border-radius:16px;border:3px solid var(--c);box-shadow:0 8px 28px rgba(0,0,0,.35);padding:12px 14px;display:flex;gap:12px;align-items:center;animation:popin .25s ease-out}
 .pop .badge{width:40px;height:40px;line-height:40px;font-size:13px}
 .pop .k{font-size:13px;font-weight:900}.pop.fly .k{color:var(--fly)}.pop.land .k{color:var(--ok)}
 .pop b{display:block;font-size:17px}.pop small{color:var(--sub)}
 .pop.out{opacity:0;transition:opacity .3s}
 .pop.nearpop{border-color:var(--fly)}.pop.nearpop .k{color:var(--fly)}
-@keyframes popin{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
-.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:12px;font-weight:700;font-size:14px;z-index:40;display:none;align-items:center;gap:12px;max-width:94vw}
+@keyframes popin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.toast{position:fixed;left:50%;top:62px;pointer-events:none;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:12px;font-weight:700;font-size:14px;z-index:40;display:none;align-items:center;gap:12px;max-width:94vw}
 .toast.show{display:flex}
-.toast button{white-space:nowrap;flex:none;background:var(--bg);color:var(--ink);border:0;border-radius:8px;padding:6px 10px;font-weight:800}
+.toast button{pointer-events:auto;white-space:nowrap;flex:none;background:var(--bg);color:var(--ink);border:0;border-radius:8px;padding:6px 10px;font-weight:800}
 .unlock{position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:34;background:#1b4dd8;color:#fff;font-weight:800;font-size:14px;padding:11px 16px;border:0;border-radius:999px;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.3)}
 .hidden{display:none!important}
 </style>
@@ -133,7 +134,14 @@ else if (/^http:\/\/(localhost|127\.0\.0\.1)/.test(qs.get('push') || '')) PUSH =
 const DEVICE = Math.random().toString(36).slice(2,10);
 const S = { units:{}, rev:'', offset:0, lastOk:0, fail:0, push:false, loaded:false };
 const pending = {};
-let myId = LS.get('unit', null);   // null = 아직 선택 안 함, '' = 보기 전용
+const ORGS = [];
+UNITS.forEach(u => { let g = ORGS.find(o => o.org === u.org); if (!g){ g = {org:u.org, team:u.team, color:u.color, list:[]}; ORGS.push(g); } g.list.push(u); });
+let myOrg = LS.get('org', null);   // null = 아직 선택 안 함, '' = 보기 전용
+if (myOrg == null){ const old = LS.get('unit', null); if (old === '') myOrg = ''; else if (old && U[old]) myOrg = U[old].org; if (myOrg != null) LS.set('org', myOrg); } // 이전 버전(드론 단위 선택) 기억값 이어받기
+if (myOrg && !ORGS.some(g => g.org === myOrg)) myOrg = null;
+const myUnits = () => myOrg ? UNITS.filter(u => u.org === myOrg) : [];
+const isMine = id => !!(myOrg && U[id] && U[id].org === myOrg);
+const isFly = id => (S.units[id] || {}).s === 'fly';
 let pollTimer = null, polling = false, es = null, lastNearKey = '';
 let plan = null; // 비행 전, 지도에서 고른 예정 위치
 
@@ -163,7 +171,7 @@ function unlockAudio(){
     if (AC.state !== 'running') AC.resume().then(() => setTimeout(syncUnlock, 400)).catch(()=>{}); else setTimeout(syncUnlock, 400);
   }catch(_){}
 }
-function syncUnlock(){ $('#unlock').classList.toggle('hidden', !soundOn || audioOk() || myId == null); }
+function syncUnlock(){ $('#unlock').classList.toggle('hidden', !soundOn || audioOk() || myOrg == null); }
 function tone(f, at, dur, type, vol){
   const t0 = AC.currentTime + at, o = AC.createOscillator(), g = AC.createGain();
   o.type = type; o.frequency.setValueAtTime(f, t0);
@@ -258,17 +266,16 @@ function pushConnect(){
 }
 const num = v => (v === '' || v == null || !isFinite(+v)) ? null : Math.min(1, Math.max(0, +v));
 
-/* ---------- 내 비행: 지도 탭 = 시작/위치이동, 버튼 = 종료 ---------- */
+/* ---------- 내 비행: 지도 탭 = 위치 고르기, 버튼 = 기종별 시작/이동/종료 ---------- */
 let chain = Promise.resolve();
-function send(action, x, y){
-  const cur = S.units[myId] || {s:'land'};
+function send(id, action, x, y){
+  const cur = S.units[id] || {s:'land'};
   const t = Math.round(now());
   const s = action === 'move' ? 'fly' : action;
   const pos = x != null ? {x, y, z: nearestZone(x, y)} : {x:cur.x, y:cur.y, z:cur.z};
   const o = {s, ...pos, al:'', n:'', since: s === 'fly' ? (cur.s === 'fly' && cur.since ? cur.since : t) : 0, t};
-  S.units[myId] = o; pending[myId] = {o, until: Date.now() + 20000};
-  pushSend(myId, o, action); render();
-  const id = myId;
+  S.units[id] = o; pending[id] = {o, until: Date.now() + 20000};
+  pushSend(id, o, action); render();
   chain = chain.then(async () => {
     for (let i=0;i<3;i++){
       try{ const j = await api({a:'set', u:id, s:action, z:o.z, x:o.x, y:o.y}); S.offset = j.now - Date.now(); applySnap(j); S.lastOk = Date.now(); S.fail = 0; setDot(); return; }
@@ -278,16 +285,15 @@ function send(action, x, y){
   });
 }
 $('#map').addEventListener('click', e => {
-  if (!myId){ if (myId === '') toast('보기 전용이에요. 위 버튼에서 내 드론을 고르세요'); return; }
+  if (!myOrg){ if (myOrg === '') toast('보기 전용이에요. 위 버튼에서 내 업체를 고르세요'); return; }
   const r = e.currentTarget.getBoundingClientRect();
-  const x = Math.round(Math.min(1, Math.max(0, (e.clientX - r.left)/r.width))*10000)/10000;
-  const y = Math.round(Math.min(1, Math.max(0, (e.clientY - r.top)/r.height))*10000)/10000;
-  const flying = (S.units[myId] || {}).s === 'fly';
-  if (flying){ send('move', x, y); toast(`📍 위치 이동 · ${nearestZone(x, y)}`); }
-  else { plan = {x, y}; render(); }
+  plan = { x: Math.round(Math.min(1, Math.max(0, (e.clientX - r.left)/r.width))*10000)/10000,
+           y: Math.round(Math.min(1, Math.max(0, (e.clientY - r.top)/r.height))*10000)/10000 };
+  render();
 });
-function start(){ if (!plan) return; const p = plan; plan = null; send('fly', p.x, p.y); vib(40); toast(`🛫 비행 시작 공유됨 · ${nearestZone(p.x, p.y)}`); }
-function land(){ send('land'); vib(40); toast('🛬 비행 종료 공유됨'); }
+function start(id){ if (!plan || !isMine(id)) return; const p = plan; plan = null; send(id, 'fly', p.x, p.y); vib(40); toast(`🛫 ${U[id].drone} 비행 시작 공유됨 · ${nearestZone(p.x, p.y)}`); }
+function moveTo(id){ if (!plan || !isMine(id)) return; const p = plan; plan = null; send(id, 'move', p.x, p.y); toast(`📍 ${U[id].drone} 위치 이동 · ${nearestZone(p.x, p.y)}`); }
+function land(id){ if (!isMine(id)) return; send(id, 'land'); vib(40); toast(`🛬 ${U[id].drone} 비행 종료 공유됨`); }
 
 /* ---------- 다른 팀 변화 감지 → 소리/팝업 ---------- */
 const seen = {}; let baseline = false;
@@ -297,17 +303,17 @@ function detect(skipFly){
   Object.entries(S.units).forEach(([id, u]) => {
     if (!U[id]) return;
     const prev = seen[id]; seen[id] = {s:u.s, since:u.since};
-    if (first || id === myId || (prev && prev.s === u.s)) return;
+    if (first || isMine(id) || (prev && prev.s === u.s)) return;
     if (u.s === 'fly'){ if (!skipFly) sfx('fly'); vib([150,70,150,70,300]); pop('fly', id, u.z || ''); }
     else if (prev && prev.s === 'fly'){ sfx('land'); vib(80); pop('land', id, prev.since ? `${Math.round((now()-prev.since)/60000)}분 비행` : ''); }
   });
 }
-function nears(){
+function nears(){   // 같은 업체 기체끼리는 서로 조율하므로 제외
   const fl = Object.entries(S.units).filter(([id,u]) => u.s === 'fly' && U[id] && u.x != null);
   const out = [];
   for (let i=0;i<fl.length;i++) for (let j=i+1;j<fl.length;j++){
     const [a,A] = fl[i], [b,B] = fl[j];
-    if (Math.hypot(A.x-B.x, (A.y-B.y)*ASPECT) < CONFIG.NEAR) out.push([a,b]);
+    if (U[a].org !== U[b].org && Math.hypot(A.x-B.x, (A.y-B.y)*ASPECT) < CONFIG.NEAR) out.push([a,b]);
   }
   return out;
 }
@@ -316,10 +322,10 @@ function nears(){
 const pinEls = {};
 function render(){
   const nr = nears(), nearSet = new Set(nr.flat());
-  const mine = nr.filter(p => p.includes(myId)), key = mine.map(p => p.join()).join();
+  const mine = nr.filter(p => isMine(p[0]) || isMine(p[1])), key = mine.map(p => p.join()).join();
   const myNew = S.loaded && key && key !== lastNearKey;
   detect(myNew);
-  if (myNew){ const other = mine[0][0] === myId ? mine[0][1] : mine[0][0]; sfx('warn'); vib([300,100,300,100,300]); pop('warn', other, '위치·고도 확인하세요'); }
+  if (myNew){ const other = isMine(mine[0][0]) ? mine[0][1] : mine[0][0]; sfx('warn'); vib([300,100,300,100,300]); pop('warn', other, '위치·고도 확인하세요'); }
   lastNearKey = key;
   $('#warn').innerHTML = nr.map(([a,b]) => `<div class="warn">⚠ 가까이 비행 중 · ${esc(label(a))} / ${esc(label(b))}</div>`).join('');
 
@@ -331,10 +337,14 @@ function render(){
     while (placed.some(q => Math.hypot(q.x-x, (q.y-y)*ASPECT) < .032) && k < 8){ k++; const a = k*Math.PI/3; x = (u.x ?? .5) + Math.cos(a)*.035; y = (u.y ?? .08) + Math.sin(a)*.035/ASPECT; }
     placed.push({x,y}); keep.add(id);
     let el = pinEls[id]; if (!el){ el = document.createElement('div'); $('#map').appendChild(el); pinEls[id] = el; }
-    el.className = 'pin' + (id === myId ? ' mine' : '') + (nearSet.has(id) ? ' near' : '');
+    el.className = 'pin' + (isMine(id) ? ' mine' : '') + (nearSet.has(id) ? ' near' : '');
     el.style.setProperty('--c', U[id].color); el.style.left = x*100 + '%'; el.style.top = y*100 + '%'; el.textContent = U[id].short;
   });
-  if (plan && myId && !(S.units[myId] && S.units[myId].s === 'fly')){ keep.add('_plan'); let el = pinEls._plan; if (!el){ el = document.createElement('div'); $('#map').appendChild(el); pinEls._plan = el; } el.className = 'pin plan'; el.style.setProperty('--c', U[myId].color); el.style.left = plan.x*100 + '%'; el.style.top = plan.y*100 + '%'; el.textContent = U[myId].short; } else plan = flying0() ? null : plan;
+  const mu = myUnits();
+  if (plan && mu.length){
+    keep.add('_plan'); let el = pinEls._plan; if (!el){ el = document.createElement('div'); $('#map').appendChild(el); pinEls._plan = el; }
+    el.className = 'pin plan'; el.style.setProperty('--c', mu[0].color); el.style.left = plan.x*100 + '%'; el.style.top = plan.y*100 + '%'; el.textContent = '여기';
+  }
   Object.keys(pinEls).forEach(k => { if (!keep.has(k)){ pinEls[k].remove(); delete pinEls[k]; } });
 
   // 목록
@@ -343,25 +353,30 @@ function render(){
   $('#list').innerHTML = fl.length ? fl.map(([id,u]) => `<div class="row" style="--c:${U[id].color}"><i class="badge">${esc(U[id].short)}</i><b>${esc(label(id))}<small>${esc(U[id].team)} · ${esc(u.z || '')}</small></b><span class="st" data-since="${u.since}">${mmss(now()-u.since)}</span></div>`).join('')
     : `<div class="empty">${S.loaded ? '비행 중인 드론이 없어요' : '불러오는 중…'}</div>`;
 
-  // 상단 내 드론 + 하단 바
-  const u = U[myId];
-  $('#meBtn').innerHTML = u ? `<i style="--c:${u.color}">${esc(u.short)}</i>${esc(label(myId))} ▾` : '👀 보기 전용 ▾';
-  const flying = myId && (S.units[myId] || {}).s === 'fly';
-  $('#hint').textContent = !myId ? '깜빡이는 핀 = 비행 중' : flying ? '비행 중 · 지도를 누르면 내 위치가 옮겨져요' : plan ? '점선 핀 위치가 맞으면 아래 버튼을 누르세요' : '👆 지도에서 비행할 위치를 누르세요';
-  $('#bar').innerHTML = !myId ? `<div class="tip">보기 전용<small>상단 버튼에서 내 드론을 고르면 비행을 알릴 수 있어요</small></div>`
-    : flying ? `<button class="big" id="landBtn">🛬 비행 종료<small>${esc(S.units[myId].z || '')} · <span data-since="${S.units[myId].since}">${mmss(now()-S.units[myId].since)}</span></small></button>`
-    : plan ? `<div class="btns"><button class="big go" id="goBtn">🛫 여기서 비행 시작<small>${esc(nearestZone(plan.x, plan.y))} · 모든 팀에 알림</small></button><button class="no" id="noBtn">취소</button></div>`
-    : `<div class="tip">👆 지도에서 비행할 위치를 누르세요<small>위치를 고른 뒤 시작 버튼을 누르면 모든 팀에 알려집니다</small></div>`;
+  // 상단 내 업체 + 하단 버튼
+  const g = ORGS.find(o => o.org === myOrg);
+  $('#meBtn').innerHTML = g ? `<i style="--c:${g.color}"></i>${esc(g.org)} ▾` : '👀 보기 전용 ▾';
+  const multi = mu.length > 1, myFl = mu.filter(u => isFly(u.id));
+  $('#hint').textContent = !myOrg ? '깜빡이는 핀 = 비행 중'
+    : plan ? '점선 핀 위치가 맞으면 아래 버튼을 누르세요'
+    : myFl.length ? (multi ? '비행 중 · 위치를 옮기거나 다른 기체를 띄우려면 지도를 누르세요' : '비행 중 · 위치를 옮기려면 지도를 누르세요')
+    : '👆 지도에서 비행할 위치를 누르세요';
+  const zone = plan ? esc(nearestZone(plan.x, plan.y)) : '';
+  const timeOf = u => `<span data-since="${S.units[u.id].since}">${mmss(now()-S.units[u.id].since)}</span>`;
+  $('#bar').innerHTML = !myOrg ? `<div class="tip">보기 전용<small>상단 버튼에서 내 업체를 고르면 비행을 알릴 수 있어요</small></div>`
+    : plan ? `<div class="btns${multi ? ' multi' : ''}">` + mu.map(u => isFly(u.id)
+          ? `<button class="big mv" data-mv="${u.id}">📍 ${multi ? esc(u.drone) + ' 이동' : '여기로 이동'}<small>${zone}</small></button>`
+          : `<button class="big go" data-go="${u.id}">🛫 ${multi ? esc(u.drone) + ' 시작' : '여기서 비행 시작'}<small>${multi ? zone : esc(u.drone) + ' · ' + zone + ' · 모든 팀에 알림'}</small></button>`).join('') +
+        `<button class="no" id="noBtn">취소</button></div>`
+    : myFl.length ? `<div class="btns${myFl.length > 1 ? ' multi' : ''}">` + myFl.map(u => `<button class="big" data-land="${u.id}">🛬 ${multi ? esc(u.drone) + ' ' : '비행 '}종료<small>${esc(S.units[u.id].z || '')} · ${timeOf(u)}</small></button>`).join('') + `</div>`
+    : `<div class="tip">👆 지도에서 비행할 위치를 누르세요<small>${multi ? '위치를 고르면 기종별 시작 버튼이 나와요' : '위치를 고른 뒤 시작 버튼을 누르면 모든 팀에 알려집니다'}</small></div>`;
   syncUnlock();
 }
-function flying0(){ return !!(myId && S.units[myId] && S.units[myId].s === 'fly'); }
 function showPick(){
-  const orgs = [];
-  UNITS.forEach(u => { let g = orgs.find(o => o.org === u.org); if (!g){ g = {org:u.org, team:u.team, color:u.color, list:[]}; orgs.push(g); } g.list.push(u); });
-  $('#pick').innerHTML = `<h2>내 드론을 선택하세요</h2><p>업체를 찾아 기종을 누르세요. 이 폰에 기억되고, 상단 버튼으로 언제든 바꿀 수 있어요.</p><div class="orgs">` +
-    orgs.map(g => `<div class="org" style="--c:${g.color}"><div class="oh"><i class="cbar"></i><b>${esc(g.org)}</b><span>${esc(g.team)}</span></div><div class="ds">` +
-      g.list.map(u => `<button data-pick="${u.id}" class="${u.id === myId ? 'on' : ''}">${esc(u.drone)}</button>`).join('') + `</div></div>`).join('') +
-    `<button class="view" data-pick="">👀 보기만 할게요 (관제·연출)</button></div>`;
+  $('#pick').innerHTML = `<h2>내 업체를 선택하세요</h2><p>기종은 이륙할 때 고르면 돼요 · 이 폰에 기억됨</p><div class="orgs">` +
+    ORGS.map(g => `<button class="org${g.org === myOrg ? ' on' : ''}" data-org="${esc(g.org)}" style="--c:${g.color}"><span class="oh"><b>${esc(g.org)}</b><span>${esc(g.team)}</span></span><span class="ds">` +
+      g.list.map(u => `<em>${esc(u.drone)}</em>`).join('') + `</span></button>`).join('') +
+    `<button class="view" data-org="">👀 보기만 할게요 (관제·연출)</button></div>`;
   $('#pick').classList.remove('hidden');
 }
 setInterval(() => document.querySelectorAll('[data-since]').forEach(el => { const s = +el.dataset.since; if (s) el.textContent = mmss(now()-s); }), 1000);
@@ -369,12 +384,13 @@ setInterval(() => { setDot(); if (S.loaded) render(); }, 15000);
 
 document.addEventListener('click', e => {
   const t = e.target.closest('button'); if (!t) return;
-  if (t.dataset.pick != null){ myId = t.dataset.pick; LS.set('unit', myId); $('#pick').classList.add('hidden'); render(); if (myId) toast(`${label(myId)} 선택됨 · 지도를 눌러 비행 시작`); return; }
-  if (t.id === 'landBtn') return land();
-  if (t.id === 'goBtn') return start();
+  if (t.dataset.org != null){ myOrg = t.dataset.org; LS.set('org', myOrg); plan = null; $('#pick').classList.add('hidden'); render(); if (myOrg) toast(`${myOrg} 선택됨 · 지도를 눌러 비행 시작`); return; }
+  if (t.dataset.go) return start(t.dataset.go);
+  if (t.dataset.mv) return moveTo(t.dataset.mv);
+  if (t.dataset.land) return land(t.dataset.land);
   if (t.id === 'noBtn'){ plan = null; return render(); }
   if (t.id === 'unlock'){ soundOn = true; LS.set('sound', true); unlockAudio(); t.classList.add('hidden'); toast('🔔 알림 소리 켜짐'); return; }
-  if (t.id === 'meBtn'){ if ((S.units[myId] || {}).s === 'fly'){ toast('비행 중에는 바꿀 수 없어요. 먼저 종료를 눌러주세요'); return; } return showPick(); }
+  if (t.id === 'meBtn'){ if (myUnits().some(u => isFly(u.id))){ toast('비행 중에는 바꿀 수 없어요. 먼저 종료를 눌러주세요'); return; } return showPick(); }
   if (t.id === 'toastBtn'){ if (toastUndo){ const f = toastUndo; toastUndo = null; f(); toast('취소했어요'); } return; }
   if (t.id === 'sndBtn'){ soundOn = !soundOn; LS.set('sound', soundOn); t.textContent = soundOn ? '🔔' : '🔕'; t.classList.toggle('off', !soundOn); if (soundOn) unlockAudio(); toast(soundOn ? '🔔 알림 소리 켜짐' : '🔕 소리 꺼짐 (팝업·진동은 유지)'); syncUnlock(); return; }
 });
@@ -383,7 +399,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden){ clea
 window.addEventListener('online', () => { poll(); if (!es) pushConnect(); });
 
 $('#sndBtn').textContent = soundOn ? '🔔' : '🔕'; $('#sndBtn').classList.toggle('off', !soundOn);
-if (myId == null) showPick();
+if (myOrg == null) showPick();
 render(); poll(); pushConnect();
 </script>
 </body>
