@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <title>BIRF 드론 현황판</title>
-<!-- v2.5 간편 버전 -->
+<!-- v2.6 간편 버전 -->
 <style>
 :root{--bg:#eef0ec;--card:#fff;--ink:#111418;--sub:#5b6168;--line:#d9ddd6;--fly:#d7263d;--ok:#14833b;--chip:#f2f4f1}
 @media (prefers-color-scheme:dark){:root{--bg:#0d0f12;--card:#171a1f;--ink:#f2f3f5;--sub:#a3a9b1;--line:#2a2f36;--fly:#ff4d5e;--ok:#3ccf6e;--chip:#222730}}
@@ -60,7 +60,7 @@ header h1{font-size:16px;margin:0;font-weight:800}
 .oh .cbar{width:6px;height:22px;border-radius:3px;background:var(--c)}
 .oh b{font-size:17px}.oh span{margin-left:auto;font-size:12px;font-weight:700;color:var(--c);background:var(--chip);border-radius:999px;padding:4px 10px;white-space:nowrap}
 .ds{display:flex;gap:8px;flex-wrap:wrap}
-.ds button{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:var(--chip);border-radius:12px;padding:10px 14px;font-weight:800;font-size:16px;min-height:52px;flex:1;min-width:130px}
+.ds button{display:flex;align-items:center;justify-content:center;gap:8px;border:1.5px solid var(--line);background:var(--chip);border-radius:12px;padding:10px 14px;font-weight:800;font-size:16px;min-height:52px;flex:1;min-width:130px}
 .ds button.on{border-color:var(--c);box-shadow:inset 0 0 0 1.5px var(--c)}
 .ds .badge{width:30px;height:30px;line-height:30px;font-size:11px}
 .orgs .view{border:1.5px dashed var(--line);background:none;border-radius:14px;min-height:52px;font-weight:700;color:var(--sub)}
@@ -357,7 +357,7 @@ function showPick(){
   UNITS.forEach(u => { let g = orgs.find(o => o.org === u.org); if (!g){ g = {org:u.org, team:u.team, color:u.color, list:[]}; orgs.push(g); } g.list.push(u); });
   $('#pick').innerHTML = `<h2>내 드론을 선택하세요</h2><p>업체를 찾아 기종을 누르세요. 이 폰에 기억되고, 상단 버튼으로 언제든 바꿀 수 있어요.</p><div class="orgs">` +
     orgs.map(g => `<div class="org" style="--c:${g.color}"><div class="oh"><i class="cbar"></i><b>${esc(g.org)}</b><span>${esc(g.team)}</span></div><div class="ds">` +
-      g.list.map(u => `<button data-pick="${u.id}" class="${u.id === myId ? 'on' : ''}"><i class="badge">${esc(u.short)}</i>${esc(u.drone)}</button>`).join('') + `</div></div>`).join('') +
+      g.list.map(u => `<button data-pick="${u.id}" class="${u.id === myId ? 'on' : ''}">${esc(u.drone)}</button>`).join('') + `</div></div>`).join('') +
     `<button class="view" data-pick="">👀 보기만 할게요 (관제·연출)</button></div>`;
   $('#pick').classList.remove('hidden');
 }
