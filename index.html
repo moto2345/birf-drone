@@ -217,7 +217,7 @@ footer{color:var(--sub);font-size:12px;padding:16px 2px 8px;display:flex;gap:12p
     </div>
   </div>
   <footer>
-    <span>v1.1 · 2026 부산국제록페스티벌 드론 소통용</span>
+    <span>v1.2 · 2026 부산국제록페스티벌 드론 소통용</span>
     <button class="linkbtn" id="shareBtn">공유 링크 복사</button>
     <button class="linkbtn" id="resetApiBtn">시트 연결 변경</button>
   </footer>
@@ -695,7 +695,8 @@ function renderLog(){
   if (!S.log.length){ box.innerHTML = `<div class="empty">${S.loaded ? '아직 기록이 없어요' : '불러오는 중…'}</div>`; return; }
   box.innerHTML = S.log.slice(0, 20).map(r => {
     const [t, id, act, z, al, n, mins] = r;
-    const hhmm = String(t).slice(11, 16);
+    const ts = String(t), dd = new Date(ts);
+    const hhmm = /^\d{4}-\d\d-\d\d /.test(ts) ? ts.slice(11, 16) : (isNaN(dd) ? '' : dd.toTimeString().slice(0, 5)); // 시트가 날짜로 바꿔도 시:분 표시
     const extra = [z, al, mins !== '' && mins != null ? `${mins}분 비행` : '', n].filter(Boolean).join(' · ');
     return `<div><time>${esc(hhmm)}</time><span><b>${esc(label(id))}</b> <span class="a-${esc(act)}">${esc(act)}</span>${extra ? ' · ' + esc(extra) : ''}</span></div>`;
   }).join('');
